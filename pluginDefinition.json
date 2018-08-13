@@ -1,0 +1,31 @@
+{
+  "identifier": "com.rs.mvd.vt",
+  "apiVersion": "1.0.0",
+  "pluginVersion": "0.9.0",
+  "pluginType": "application",
+  "webContent": {
+    "framework": "angular2",
+    "launchDefinition": {
+      "pluginShortNameKey": "VT Terminal",
+      "pluginShortNameDefault": "VT Terminal",
+      "imageSrc": "assets/icon.png"
+    },
+    "descriptionKey": "VT Description",
+    "descriptionDefault": "VT Description",
+    "isSingleWindowApp": true,
+    "defaultWindowStyle": {
+      "width": 800,
+      "height": 600,
+      "x": 200,
+      "y": 50
+    }
+  },
+  "configurationData": {
+    "resources": {
+      "sessions": {
+        "locationType": "relative",
+        "aggregationPolicy": "override"
+      }
+    }
+  }
+}
