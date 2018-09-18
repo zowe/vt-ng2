@@ -41,7 +41,7 @@ export class Terminal {
     const protocol = window.location.protocol;
     const wsProtocol = (protocol === 'https:') ? 'wss:' : 'ws:';
     let computedURL:string = `${wsProtocol}//${myHost}/ZLUX/plugins/com.rs.terminalproxy/services/vtdata`;    
-    //let computedURL:string = RocketMVD.uriBroker.pluginWSUri(plugin,'data','');
+    //let computedURL:string = ZoweZLUX.uriBroker.pluginWSUri(plugin,'data','');
     connectionSettings.url = computedURL;
     connectionSettings.connect = true;
     connectionSettings.screenWidth = "MAX";
