@@ -31,7 +31,7 @@
         </select>
       </div>      
       <div class="power-toggle">
-        <button type="submit" class="power-toggle-button btn" [style.background-color]="isConnected ? '#17da38' : '#b9b9b9'" (click)="toggleConnection()"></button>
+        <button type="submit" class="power-toggle-button btn" [style.background-color]="powerButtonColor" [disabled]="disableButton" (click)="toggleConnection()"></button>
       </div>
     </div>
   </div>

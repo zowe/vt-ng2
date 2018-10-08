@@ -48,6 +48,15 @@ class ErrorState {
     this.stateArray.fill(null);
   }
 
+  //should it block connection
+  isStateBlocking(): boolean {
+    if (this.stateArray[ErrorType.host] || this.stateArray[ErrorType.port]){
+      return true;
+    }
+    return false;
+  }
+
+  
   getFirstError(): string|null {
     for (let i = 0; i < this.stateArray.length; i++) {
       if (this.stateArray[i]) {
@@ -78,6 +87,7 @@ export class AppComponent implements AfterViewInit {
   showMenu: boolean;
   private terminalHeightOffset: number = 0;
   private currentErrors: ErrorState = new ErrorState();
+  disableButton: boolean;
   
   constructor(
     private http: Http,
@@ -223,7 +233,13 @@ export class AppComponent implements AfterViewInit {
     let error = this.currentErrors.getFirstError();
 
     let hadError = this.errorMessage.length > 0;
-    this.errorMessage = error ? error : '';
+    if (error) {
+      this.errorMessage = error;
+      this.disableButton = this.currentErrors.isStateBlocking() ? true : false;
+    } else {
+      this.errorMessage = '';
+      this.disableButton = false;
+    }
 
     if ((error && !hadError) || (!error && hadError)) {
       let offset: number = error ? CONFIG_MENU_ROW_PX : -CONFIG_MENU_ROW_PX;
@@ -308,6 +324,16 @@ export class AppComponent implements AfterViewInit {
     return this.terminal.isConnected();
   }
 
+  get powerButtonColor(): string {
+    if (this.disableButton) {
+      return "#bf3030";
+    } else if (this.isConnected) {
+      return "#17da38";
+    } else {
+      return "#b9b9b9";
+    }
+  }
+  
   validatePort(): void {
     if (this.port < 0 || this.port > 65535 || !Number.isInteger(this.port)) {
       this.setError(ErrorType.port, `Port missing or invalid`);
