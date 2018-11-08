@@ -49,7 +49,7 @@ export class Terminal {
     const myHost = window.location.host;
     const protocol = window.location.protocol;
     const wsProtocol = (protocol === 'https:') ? 'wss:' : 'ws:';
-    let computedURL:string = `${wsProtocol}//${myHost}/ZLUX/plugins/com.rs.terminalproxy/services/vtdata`;    
+    let computedURL:string = `${wsProtocol}//${myHost}/ZLUX/plugins/com.rs.terminalproxy/services/vtdata/_current`;    
     //let computedURL:string = ZoweZLUX.uriBroker.pluginWSUri(plugin,'data','');
     connectionSettings.url = computedURL;
     connectionSettings.connect = true;
