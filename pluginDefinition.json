@@ -1,7 +1,7 @@
 {
-  "identifier": "com.rs.mvd.vt",
+  "identifier": "org.zowe.terminal.vt",
   "apiVersion": "1.0.0",
-  "pluginVersion": "0.9.0",
+  "pluginVersion": "0.9.4",
   "pluginType": "application",
   "webContent": {
     "framework": "angular2",
@@ -12,7 +12,6 @@
     },
     "descriptionKey": "VT Description",
     "descriptionDefault": "VT Description",
-    "isSingleWindowApp": true,
     "defaultWindowStyle": {
       "width": 800,
       "height": 600,
@@ -27,5 +26,13 @@
         "aggregationPolicy": "override"
       }
     }
-  }
+  },
+  "dataServices": [
+    {
+      "type": "import",
+      "localName": "terminalstream",
+      "sourceName": "vtdata",
+      "sourcePlugin": "org.zowe.terminal.proxy"
+    }
+  ]
 }

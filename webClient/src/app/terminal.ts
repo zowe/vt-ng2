@@ -46,12 +46,8 @@ export class Terminal {
     const width = parseInt(computedStyle.getPropertyValue('width'));
     const height = parseInt(computedStyle.getPropertyValue('height'));
     let plugin:ZLUX.Plugin = this.pluginDefinition.getBasePlugin();
-    const myHost = window.location.host;
-    const protocol = window.location.protocol;
-    const wsProtocol = (protocol === 'https:') ? 'wss:' : 'ws:';
-    let computedURL:string = `${wsProtocol}//${myHost}/ZLUX/plugins/com.rs.terminalproxy/services/vtdata`;    
-    //let computedURL:string = ZoweZLUX.uriBroker.pluginWSUri(plugin,'data','');
-    connectionSettings.url = computedURL;
+
+    connectionSettings.url = ZoweZLUX.uriBroker.pluginWSUri(plugin, 'terminalstream', '');
     connectionSettings.connect = true;
     connectionSettings.screenWidth = "MAX";
     connectionSettings.screenHeight = "MAX";
