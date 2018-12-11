@@ -32,7 +32,8 @@
       "type": "import",
       "localName": "terminalstream",
       "sourceName": "vtdata",
-      "sourcePlugin": "org.zowe.terminal.proxy"
+      "sourcePlugin": "org.zowe.terminal.proxy",
+      "versionRange": "^1.0.0"
     }
   ]
 }
