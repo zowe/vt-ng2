@@ -18,7 +18,7 @@ import 'rxjs/add/operator/map';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, Angular2PluginViewportEvents, ContextMenuItem } from 'pluginlib/inject-resources';
 
 import {Terminal, TerminalWebsocketError} from './terminal';
-import {ConfigServiceTerminalConfig, TerminalConfig} from './terminal.config';
+import {ConfigServiceTerminalConfig, TerminalConfig, ZssConfig} from './terminal.config';
 
 const TOGGLE_MENU_BUTTON_PX = 16; //with padding
 const CONFIG_MENU_ROW_PX = 40;
@@ -177,14 +177,16 @@ export class AppComponent implements AfterViewInit {
         }
         this.host = config.contents.host;
         this.port = config.contents.port;
-        this.connectionSettings = {
-          host: this.host,
-          port: this.port,
-          security: {
-            type: Number(this.securityType)
+        this.checkZssProxy().then(() => {
+          this.connectionSettings = {
+            host: this.host,
+            port: this.port,
+            security: {
+              type: Number(this.securityType)
+            }
           }
-        }
-        this.terminal.connectToHost(rendererSettings, this.connectionSettings);
+          this.terminal.connectToHost(rendererSettings, this.connectionSettings);
+        });
       }, (error)=> {
         if (error.status && error.statusText) {
           this.setError(ErrorType.config, `Config load status=${error.status}, text=${error.statusText}`);
@@ -295,6 +297,22 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
+  checkZssProxy(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      if (this.host === "") {
+        this.loadZssSettings().subscribe((zssSettings: ZssConfig) => {
+          this.host = zssSettings.zssServerHostName;
+          resolve(this.host);
+        }, () => {
+          this.setError(ErrorType.host, "Invalid Hostname: \"" + this.host + "\".")
+          reject(this.host)
+        });
+      } else {
+        resolve(this.host);
+      }
+    });
+  }
+
   toggleConnection(): void {
     if (this.terminal.isConnected()) {
       this.terminal.close();
@@ -354,6 +372,10 @@ export class AppComponent implements AfterViewInit {
     this.log.warn("Config load is wrong and not abstracted");
     return this.http.get(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(),'instance','sessions','_defaultVT.json'))
       .map((res: Response) => res.json());
+  }
+
+  loadZssSettings(): Observable<ZssConfig> {
+    return this.http.get(ZoweZLUX.uriBroker.serverRootUri("server/proxies")).map((res: Response) => res.json());
   }
 }
 
