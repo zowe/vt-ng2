@@ -123,6 +123,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.windowActions.setTitle(`VT - Disconnected`);
     this.windowActions.registerCloseHandler(():Promise<void>=> {
       return new Promise((resolve,reject)=> {
         this.ngOnDestroy();
@@ -185,7 +186,7 @@ export class AppComponent implements AfterViewInit {
               type: Number(this.securityType)
             }
           }
-          this.terminal.connectToHost(rendererSettings, this.connectionSettings);
+        this.connectAndSetTitle(rendererSettings, this.connectionSettings);
         });
       }, (error)=> {
         if (error.status && error.statusText) {
@@ -196,7 +197,7 @@ export class AppComponent implements AfterViewInit {
         }
       });
     } else {
-      this.terminal.connectToHost(rendererSettings, this.connectionSettings);
+      this.connectAndSetTitle(rendererSettings, this.connectionSettings);
     }
     log.info('END: vt ngAfterViewInit');
   }
@@ -209,6 +210,7 @@ export class AppComponent implements AfterViewInit {
     let message = "Terminal closed due to websocket error. Code="+error.code;
     this.log.warn(message+", Reason="+error.reason);
     this.setError(ErrorType.websocket, message);
+    this.disconnectAndUnsetTitle();
   }
 
   private setError(type: ErrorType, message: string):void {
@@ -275,7 +277,7 @@ export class AppComponent implements AfterViewInit {
       }
       switch (eventContext.data.type) {
       case 'disconnect':
-        resolve(this.terminal.close());
+        resolve(this.disconnectAndUnsetTitle());
         break;
       case 'connectionInfo':
         let hostInfo = this.terminal.virtualScreen.hostInfo;
@@ -315,10 +317,10 @@ export class AppComponent implements AfterViewInit {
 
   toggleConnection(): void {
     if (this.terminal.isConnected()) {
-      this.terminal.close();
+      this.disconnectAndUnsetTitle();
     } else {
       this.clearAllErrors(); //reset due to user interaction
-      this.terminal.connectToHost({
+      this.connectAndSetTitle({
           fontProperties: {
             size: 14
           }
@@ -333,6 +335,18 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
+  private disconnectAndUnsetTitle() {
+    this.terminal.close();
+    if (this.windowActions) {this.windowActions.setTitle(`VT - Disconnected`);}
+  }
+
+  private connectAndSetTitle(rendererSettings: any, connectionSettings:any) {
+    if (this.windowActions) {
+      this.windowActions.setTitle(`VT - ${connectionSettings.host}:${connectionSettings.port}`);
+    }
+    this.terminal.connectToHost(rendererSettings, connectionSettings);
+  }
+  
   //identical to isConnected for now, unless there's another reason to disable input
   get isInputDisabled(): boolean {
     return this.terminal.isConnected();
