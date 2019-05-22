@@ -39,6 +39,14 @@ export class ConfigServiceTerminalConfig {
   }
 }
 
+export class ZssConfig {
+  constructor(
+    public zssServerHostName: string,
+    public zssPort: string
+  ) {
+  }
+}
+
 
 
 /*
