@@ -1,0 +1,10 @@
+I, 1000TurquoisePogs hereby sign-off-by all of my past commits to this repo subject to the Developer Certificate of Origin (DCO), Version 1.1. In the past I have used emails: sgrady@rocketsoftware.com and 30730276+1000TurquoisePogs@users.noreply.github.com
+
+117a96be11fff462783843742b4b09fb55bd5ea9 initial commit
+
+1703c85a82f995a4184e8ee535e9e32284e463e1 Update README.md
+
+Updated README to mention how to change the default host
+5bb6c7ddf026671a4f3316072808c1d9ce1480c8 Update README.md
+
+Incorrect info in README

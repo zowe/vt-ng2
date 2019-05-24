@@ -18,7 +18,7 @@ import 'rxjs/add/operator/map';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, Angular2PluginViewportEvents, ContextMenuItem } from 'pluginlib/inject-resources';
 
 import {Terminal, TerminalWebsocketError} from './terminal';
-import {ConfigServiceTerminalConfig, TerminalConfig} from './terminal.config';
+import {ConfigServiceTerminalConfig, TerminalConfig, ZssConfig} from './terminal.config';
 
 const TOGGLE_MENU_BUTTON_PX = 16; //with padding
 const CONFIG_MENU_ROW_PX = 40;
@@ -123,6 +123,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.windowActions.setTitle(`VT - Disconnected`);
     this.windowActions.registerCloseHandler(():Promise<void>=> {
       return new Promise((resolve,reject)=> {
         this.ngOnDestroy();
@@ -177,14 +178,16 @@ export class AppComponent implements AfterViewInit {
         }
         this.host = config.contents.host;
         this.port = config.contents.port;
-        this.connectionSettings = {
-          host: this.host,
-          port: this.port,
-          security: {
-            type: Number(this.securityType)
+        this.checkZssProxy().then(() => {
+          this.connectionSettings = {
+            host: this.host,
+            port: this.port,
+            security: {
+              type: Number(this.securityType)
+            }
           }
-        }
-        this.terminal.connectToHost(rendererSettings, this.connectionSettings);
+        this.connectAndSetTitle(rendererSettings, this.connectionSettings);
+        });
       }, (error)=> {
         if (error.status && error.statusText) {
           this.setError(ErrorType.config, `Config load status=${error.status}, text=${error.statusText}`);
@@ -194,7 +197,7 @@ export class AppComponent implements AfterViewInit {
         }
       });
     } else {
-      this.terminal.connectToHost(rendererSettings, this.connectionSettings);
+      this.connectAndSetTitle(rendererSettings, this.connectionSettings);
     }
     log.info('END: vt ngAfterViewInit');
   }
@@ -207,6 +210,7 @@ export class AppComponent implements AfterViewInit {
     let message = "Terminal closed due to websocket error. Code="+error.code;
     this.log.warn(message+", Reason="+error.reason);
     this.setError(ErrorType.websocket, message);
+    this.disconnectAndUnsetTitle();
   }
 
   private setError(type: ErrorType, message: string):void {
@@ -273,7 +277,7 @@ export class AppComponent implements AfterViewInit {
       }
       switch (eventContext.data.type) {
       case 'disconnect':
-        resolve(this.terminal.close());
+        resolve(this.disconnectAndUnsetTitle());
         break;
       case 'connectionInfo':
         let hostInfo = this.terminal.virtualScreen.hostInfo;
@@ -295,12 +299,28 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
+  checkZssProxy(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      if (this.host === "") {
+        this.loadZssSettings().subscribe((zssSettings: ZssConfig) => {
+          this.host = zssSettings.zssServerHostName;
+          resolve(this.host);
+        }, () => {
+          this.setError(ErrorType.host, "Invalid Hostname: \"" + this.host + "\".")
+          reject(this.host)
+        });
+      } else {
+        resolve(this.host);
+      }
+    });
+  }
+
   toggleConnection(): void {
     if (this.terminal.isConnected()) {
-      this.terminal.close();
+      this.disconnectAndUnsetTitle();
     } else {
       this.clearAllErrors(); //reset due to user interaction
-      this.terminal.connectToHost({
+      this.connectAndSetTitle({
           fontProperties: {
             size: 14
           }
@@ -315,6 +335,18 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
+  private disconnectAndUnsetTitle() {
+    this.terminal.close();
+    if (this.windowActions) {this.windowActions.setTitle(`VT - Disconnected`);}
+  }
+
+  private connectAndSetTitle(rendererSettings: any, connectionSettings:any) {
+    if (this.windowActions) {
+      this.windowActions.setTitle(`VT - ${connectionSettings.host}:${connectionSettings.port}`);
+    }
+    this.terminal.connectToHost(rendererSettings, connectionSettings);
+  }
+  
   //identical to isConnected for now, unless there's another reason to disable input
   get isInputDisabled(): boolean {
     return this.terminal.isConnected();
@@ -354,6 +386,10 @@ export class AppComponent implements AfterViewInit {
     this.log.warn("Config load is wrong and not abstracted");
     return this.http.get(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(),'instance','sessions','_defaultVT.json'))
       .map((res: Response) => res.json());
+  }
+
+  loadZssSettings(): Observable<ZssConfig> {
+    return this.http.get(ZoweZLUX.uriBroker.serverRootUri("server/proxies")).map((res: Response) => res.json());
   }
 }
 
