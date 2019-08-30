@@ -1,6 +1,6 @@
 {
   "name": "org.zowe.terminal.vt",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "A zLUX App implementing a VT terminal emulator through web technologies.",
   "author": {
     "name": "Sean Grady",
