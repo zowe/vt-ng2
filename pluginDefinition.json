@@ -1,8 +1,11 @@
 {
   "identifier": "org.zowe.terminal.vt",
   "apiVersion": "1.0.0",
-  "pluginVersion": "0.10.1",
+  "pluginVersion": "0.10.2",
   "pluginType": "application",
+  "license": "EPL-2.0",
+  "author": "Zowe",
+  "homepage": "https://github.com/zowe/vt-ng2",
   "webContent": {
     "framework": "angular2",
     "launchDefinition": {
@@ -11,7 +14,7 @@
       "imageSrc": "assets/icon.png"
     },
     "descriptionKey": "VT Description",
-    "descriptionDefault": "VT Description",
+    "descriptionDefault": "VT-compatible SSH and Telnet Terminal",
     "defaultWindowStyle": {
       "width": 800,
       "height": 600
@@ -25,7 +28,6 @@
       }
     }
   },
-  "license": "EPL-2.0",
   "dataServices": [
     {
       "type": "import",
