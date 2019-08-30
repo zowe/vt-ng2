@@ -153,7 +153,7 @@ export class AppComponent implements AfterViewInit {
         let menuItems:ContextMenuItem[] = [];
         for (let recognizer of recognizers){
           let action = dispatcher.getAction(recognizer);
-          log.debug("JOE:recognizer="+JSON.stringify(recognizer)+" action="+action);
+          log.debug("Recognizer="+JSON.stringify(recognizer)+" action="+action);
           if (action){
             let menuCallback = () => {
               dispatcher.invokeAction(action,info.screenContext);
