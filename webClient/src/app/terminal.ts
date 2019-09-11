@@ -13,7 +13,7 @@
 import 'script-loader!./../lib/js/vt.js';
 import { Subject } from 'rxjs/Subject';
 
-declare var startVT: any;
+declare var org_zowe_terminal_vt: any;
 
 import {Injectable} from '@angular/core';
 import {Http, Response, Headers, RequestOptionsArgs} from '@angular/http';
@@ -57,7 +57,7 @@ export class Terminal {
       this.wsErrorEmitter.next({code: wsCode, reason: wsReason, terminalMessage: terminalMessage});
     };
     
-    this.virtualScreen = startVT({parentDiv:this.terminalElement,
+    this.virtualScreen = org_zowe_terminal_vt.startVT({parentDiv:this.terminalElement,
                                   width: width, height: height},
                                  connectionSettings,
                                  rendererSettings,
