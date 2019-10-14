@@ -7,8 +7,9 @@
     "email": "sgrady@rocketsoftware.com"
   },
   "scripts": {
-    "start": "webpack --progress --colors --watch",
-    "build": "webpack --progress --colors",
+    "start": "node set-paths.js && webpack --progress --colors --watch && git checkout -- tsconfig.json tslint.json",
+    "build": "node set-paths.js && webpack --progress --colors && git checkout -- tsconfig.json tslint.json",
+    "set-paths": "node set-paths.js",
     "lint": "tslint -c tslint.json \"./**/*.ts\""
   },
   "license": "EPL-2.0",
