@@ -4,9 +4,9 @@
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-  
+
   SPDX-License-Identifier: EPL-2.0
-  
+
   Copyright Contributors to the Zowe Project.
 */
 
@@ -56,7 +56,7 @@ class ErrorState {
     return false;
   }
 
-  
+
   getFirstError(): string|null {
     for (let i = 0; i < this.stateArray.length; i++) {
       if (this.stateArray[i]) {
@@ -88,7 +88,8 @@ export class AppComponent implements AfterViewInit {
   private terminalHeightOffset: number = 0;
   private currentErrors: ErrorState = new ErrorState();
   disableButton: boolean;
-  
+  private savedSettings: TerminalConfig;
+
   constructor(
     private http: Http,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
@@ -108,14 +109,14 @@ export class AppComponent implements AfterViewInit {
           this.port = cs.port;
           this.connectionSettings = cs;
         } else {
-          
+
         }
       default:
-        
+
       }
     }
     this.adjustTerminal(TOGGLE_MENU_BUTTON_PX);
-    
+
     //defaulting initializations
     if (!this.host) this.host = "localhost";
     if (!this.port) this.port = 23;
@@ -137,7 +138,7 @@ export class AppComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     let log:ZLUX.ComponentLogger = this.log;
     log.info('START: vt ngAfterViewInit');
-    let dispatcher: ZLUX.Dispatcher = ZoweZLUX.dispatcher; 
+    let dispatcher: ZLUX.Dispatcher = ZoweZLUX.dispatcher;
     log.info("JOE.vt app comp, dispatcher="+dispatcher);
     const terminalElement = this.terminalElementRef.nativeElement;
     const terminalParentElement = this.terminalParentElementRef.nativeElement;
@@ -182,6 +183,7 @@ export class AppComponent implements AfterViewInit {
         }
         this.host = config.contents.host;
         this.port = config.contents.port;
+        this.setSavedSettings();
         this.checkZssProxy().then(() => {
           this.connectionSettings = {
             host: this.host,
@@ -252,7 +254,7 @@ export class AppComponent implements AfterViewInit {
     if ((error && !hadError) || (!error && hadError)) {
       let offset: number = error ? CONFIG_MENU_ROW_PX : -CONFIG_MENU_ROW_PX;
       this.adjustTerminal(offset);
-    }    
+    }
   }
 
   toggleMenu(state:boolean): void {
@@ -261,7 +263,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   private adjustTerminal(heightOffsetPx: number): void {
-    this.terminalHeightOffset += heightOffsetPx;    
+    this.terminalHeightOffset += heightOffsetPx;
     this.terminalDivStyle = {
       top: `${this.terminalHeightOffset}px`,
       height: `calc(100% - ${this.terminalHeightOffset}px)`
@@ -291,7 +293,7 @@ export class AppComponent implements AfterViewInit {
       default:
         reject('Event context missing or unknown data.type');
       };
-    });    
+    });
   }
 
 
@@ -299,7 +301,7 @@ export class AppComponent implements AfterViewInit {
     return {
       onMessage: (eventContext: any): Promise<any> => {
         return this.zluxOnMessage(eventContext);
-      }      
+      }
     }
   }
 
@@ -350,7 +352,7 @@ export class AppComponent implements AfterViewInit {
     }
     this.terminal.connectToHost(rendererSettings, connectionSettings);
   }
-  
+
   //identical to isConnected for now, unless there's another reason to disable input
   get isInputDisabled(): boolean {
     return this.terminal.isConnected();
@@ -369,7 +371,7 @@ export class AppComponent implements AfterViewInit {
       return "#b9b9b9";
     }
   }
-  
+
   validatePort(): void {
     if (this.port < 0 || this.port > 65535 || !Number.isInteger(this.port)) {
       this.setError(ErrorType.port, `Port missing or invalid`);
@@ -385,7 +387,7 @@ export class AppComponent implements AfterViewInit {
       this.clearError(ErrorType.host);
     }
   }
-  
+
   loadConfig(): Observable<ConfigServiceTerminalConfig> {
     this.log.warn("Config load is wrong and not abstracted");
     return this.http.get(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(),'instance','sessions','_defaultVT.json'))
@@ -395,6 +397,43 @@ export class AppComponent implements AfterViewInit {
   loadZssSettings(): Observable<ZssConfig> {
     return this.http.get(ZoweZLUX.uriBroker.serverRootUri("server/proxies")).map((res: Response) => res.json());
   }
+
+
+  saveSettings() {
+    this.http.put(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), 'user', 'sessions', 'favVT.json'),
+      {
+        security: {
+          type: Number(this.securityType)
+        },
+        port: this.port,
+        host: this.host,
+      }
+    ).subscribe((res) => console.log(res));
+  }
+
+  loadSavedSettings(): Observable<ConfigServiceTerminalConfig> {
+    return this.http.get(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), 'user', 'sessions', 'favVT.json'))
+      .map((res) => res.json());
+  }
+
+  setSavedSettings() {
+    this.loadSavedSettings().subscribe((res: ConfigServiceTerminalConfig) => {
+        if (res) {
+          this.savedSettings = res.contents;
+          this.host = this.savedSettings.host;
+          this.port = this.savedSettings.port;
+          this.securityType = this.savedSettings.security.type;
+        }
+      },
+      (error) => {
+        if (error.status && error.statusText) {
+          this.setError(ErrorType.config, `Config load status=${error.status}, text=${error.statusText}`);
+        } else {
+          this.log.warn(`Config load error=${error}`);
+          this.setError(ErrorType.config, `Unknown config load error. Check browser log`);
+        }
+      });
+  }
 }
 
 
@@ -403,9 +442,9 @@ export class AppComponent implements AfterViewInit {
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-  
+
   SPDX-License-Identifier: EPL-2.0
-  
+
   Copyright Contributors to the Zowe Project.
 */
 
