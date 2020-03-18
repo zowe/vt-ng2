@@ -395,6 +395,18 @@ export class AppComponent implements AfterViewInit {
   loadZssSettings(): Observable<ZssConfig> {
     return this.http.get(ZoweZLUX.uriBroker.serverRootUri("server/proxies")).map((res: Response) => res.json());
   }
+
+  saveSettings() {
+    this.http.put(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), 'user', 'sessions', '_defaultVT.json'),
+    {
+      security: {
+        type: Number(this.securityType)
+      },
+      port: this.port,
+      host: this.host,
+    }
+    );
+  }
 }
 
 
