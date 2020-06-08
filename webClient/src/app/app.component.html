@@ -30,12 +30,12 @@
           <option value="1">SSH</option>
         </select>
       </div>
-      <div class="power-toggle">
+      <div class="terminal-button">
         <button type="submit" class="power-toggle-button btn" [style.background-color]="powerButtonColor" [disabled]="disableButton" (click)="toggleConnection()"></button>
       </div>
-      <div class="bookmark">
-        <button type="submit" class="bookmark-button btn" (click)="saveSettings()"></button>
-      </div>
+      <button class="save-button" type="submit" (click)="saveSettings()">
+        <i class="fa fa-save"></i>
+      </button>
     </div>
   </div>
   <div class="toolbar" *ngIf="errorMessage.length > 0" style="height:40px">

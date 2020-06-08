@@ -11,9 +11,8 @@
 */
 
 import { AfterViewInit, OnDestroy, Component, ElementRef, Input, ViewChild, Inject, Optional } from '@angular/core';
-import {Http, Response} from '@angular/http';
-import {Observable} from 'rxjs/Rx';
-import 'rxjs/add/operator/map';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 import { Angular2InjectionTokens, Angular2PluginWindowActions, Angular2PluginViewportEvents, ContextMenuItem } from 'pluginlib/inject-resources';
 
@@ -91,7 +90,7 @@ export class AppComponent implements AfterViewInit {
   private savedSettings: TerminalConfig;
 
   constructor(
-    private http: Http,
+    private http: HttpClient,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.VIEWPORT_EVENTS) private viewportEvents: Angular2PluginViewportEvents,
@@ -142,7 +141,7 @@ export class AppComponent implements AfterViewInit {
     log.info("JOE.vt app comp, dispatcher="+dispatcher);
     const terminalElement = this.terminalElementRef.nativeElement;
     const terminalParentElement = this.terminalParentElementRef.nativeElement;
-    this.terminal = new Terminal(terminalElement, terminalParentElement, this.http, this.pluginDefinition, this.log);
+    this.terminal = new Terminal(terminalElement, terminalParentElement, this.pluginDefinition, this.log);
     this.viewportEvents.resized.subscribe(() => this.terminal.performResize());
     if (this.windowActions) {
       this.terminal.contextMenuEmitter.subscribe( (info) => {
@@ -183,7 +182,6 @@ export class AppComponent implements AfterViewInit {
         }
         this.host = config.contents.host;
         this.port = config.contents.port;
-        this.setSavedSettings();
         this.checkZssProxy().then(() => {
           this.connectionSettings = {
             host: this.host,
@@ -390,17 +388,16 @@ export class AppComponent implements AfterViewInit {
 
   loadConfig(): Observable<ConfigServiceTerminalConfig> {
     this.log.warn("Config load is wrong and not abstracted");
-    return this.http.get(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(),'instance','sessions','_defaultVT.json'))
-      .map((res: Response) => res.json());
+    return this.http.get<ConfigServiceTerminalConfig>(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(),'user','sessions','_defaultVT.json'));
   }
 
   loadZssSettings(): Observable<ZssConfig> {
-    return this.http.get(ZoweZLUX.uriBroker.serverRootUri("server/proxies")).map((res: Response) => res.json());
+    return this.http.get<ZssConfig>(ZoweZLUX.uriBroker.serverRootUri("server/proxies"));
   }
 
 
   saveSettings() {
-    this.http.put(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), 'user', 'sessions', 'favVT.json'),
+    this.http.put(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), 'user', 'sessions', '_defaultVT.json'),
       {
         security: {
           type: Number(this.securityType)
@@ -408,31 +405,7 @@ export class AppComponent implements AfterViewInit {
         port: this.port,
         host: this.host,
       }
-    ).subscribe((res) => console.log(res));
-  }
-
-  loadSavedSettings(): Observable<ConfigServiceTerminalConfig> {
-    return this.http.get(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), 'user', 'sessions', 'favVT.json'))
-      .map((res) => res.json());
-  }
-
-  setSavedSettings() {
-    this.loadSavedSettings().subscribe((res: ConfigServiceTerminalConfig) => {
-        if (res) {
-          this.savedSettings = res.contents;
-          this.host = this.savedSettings.host;
-          this.port = this.savedSettings.port;
-          this.securityType = this.savedSettings.security.type;
-        }
-      },
-      (error) => {
-        if (error.status && error.statusText) {
-          this.setError(ErrorType.config, `Config load status=${error.status}, text=${error.statusText}`);
-        } else {
-          this.log.warn(`Config load error=${error}`);
-          this.setError(ErrorType.config, `Unknown config load error. Check browser log`);
-        }
-      });
+    ).subscribe((res) => this.log.debug('Save returned'));
   }
 }
 
