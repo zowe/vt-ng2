@@ -397,10 +397,11 @@ export class AppComponent implements AfterViewInit {
 
 
   saveSettings() {
+    let securityType = this.securityType == "1" ? "ssh" : "telnet";
     this.http.put(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), 'user', 'sessions', '_defaultVT.json'),
       {
         security: {
-          type: Number(this.securityType)
+          type: securityType
         },
         port: this.port,
         host: this.host,
