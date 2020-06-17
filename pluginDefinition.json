@@ -1,7 +1,7 @@
 {
   "identifier": "org.zowe.terminal.vt",
   "apiVersion": "1.0.0",
-  "pluginVersion": "0.10.3",
+  "pluginVersion": "0.11.0",
   "pluginType": "application",
   "license": "EPL-2.0",
   "author": "Zowe",
@@ -14,7 +14,7 @@
       "imageSrc": "assets/icon.png"
     },
     "descriptionKey": "VT Description",
-    "descriptionDefault": "SSH and Telnet Terminal Emulator",
+    "descriptionDefault": "Basic VT Terminal Emulator for SSH and Telnet",
     "defaultWindowStyle": {
       "width": 800,
       "height": 600
