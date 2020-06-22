@@ -11,13 +11,11 @@
 */
 
 import 'script-loader!./../lib/js/vt.js';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 declare var org_zowe_terminal_vt: any;
 
 import {Injectable} from '@angular/core';
-import {Http, Response, Headers, RequestOptionsArgs} from '@angular/http';
-import {Observable} from 'rxjs/Rx';
 
 export type TerminalWebsocketError = {
   code: number;
@@ -33,7 +31,6 @@ export class Terminal {
   constructor(
     private terminalElement: HTMLElement,
     private terminalParentElement: HTMLElement,
-    public http: Http,
     public pluginDefinition: ZLUX.ContainerPluginDefinition,
     private log: ZLUX.ComponentLogger
   ) { }
