@@ -1,6 +1,6 @@
 {
   "name": "org.zowe.terminal.vt",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "A Zowe App for SSH and Telnet Terminal Emulation",
   "author": "Zowe",
   "homepage": "https://github.com/zowe/vt-ng2",
