@@ -14,7 +14,7 @@
   <button class="toggle-menu expand-menu" *ngIf="!showMenu" type="submit" (click)="toggleMenu(true)"></button>
   <button class="toggle-menu contract-menu" *ngIf="showMenu" type="submit" (click)="toggleMenu(false)"></button>
   <div *ngIf="showMenu" class="toolbar">
-    <div class="form-group row toolbar-row">
+    <div class="form-group toolbar-row">
       <label class="col-sm-1 col-form-label">Host</label>
       <div class="toolbar-input col-sm-2">
         <input class="form-control" [disabled]="isInputDisabled" required minlength="1" (input)="validateHost()" [(ngModel)]="host">
