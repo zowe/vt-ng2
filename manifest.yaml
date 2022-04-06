@@ -1,0 +1,30 @@
+---
+name: vt-ng2
+id: org.zowe.terminal.vt
+# Without the v
+version: 1.0.0
+# Human readable component name
+title: VT Terminal
+# Human readable component description
+description: 'Basic VT Terminal Emulator for SSH and Telnet'
+homepage: https://zowe.org
+keywords:
+  - zlux
+  - appfw
+  - app
+  - angular
+  - vt
+  - ssh
+  - terminal
+license: EPL-2.0
+repository:
+  type: git
+  url: https://github.com/zowe/vt-ng2.git
+# we do not specify encoding here because its already tagged ascii
+build:
+  branch: "{{build.branch}}"
+  number: "{{build.number}}"
+  commitHash: "{{build.commitHash}}"
+  timestamp: "{{build.timestamp}}"
+appfwPlugins:
+  - path: .

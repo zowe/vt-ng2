@@ -1,7 +1,0 @@
-{
-  "host": "",
-  "port": 22,
-  "security": {
-    "type": "ssh"
-  }
-}
