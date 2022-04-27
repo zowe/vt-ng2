@@ -1,13 +1,13 @@
 {
   "identifier": "org.zowe.terminal.vt",
-  "apiVersion": "1.0.0",
+  "apiVersion": "2.0.0",
   "pluginVersion": "1.0.0",
   "pluginType": "application",
   "license": "EPL-2.0",
   "author": "Zowe",
   "homepage": "https://github.com/zowe/vt-ng2",
   "webContent": {
-    "framework": "angular2",
+    "framework": "angular",
     "launchDefinition": {
       "pluginShortNameKey": "VT Terminal",
       "pluginShortNameDefault": "VT Terminal",
