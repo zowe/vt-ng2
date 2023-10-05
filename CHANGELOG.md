@@ -1,4 +1,4 @@
-# Basic VT Terminal Emulator Changelog 
+# Basic VT Terminal Emulator Changelog
 
 ## `1.0.0`
 
