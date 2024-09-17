@@ -26,7 +26,7 @@ const config = {
     path.resolve(__dirname, './src/plugin.ts')
   ],
   output: {
-    path: path.resolve(__dirname, '../web'),
+    path: path.resolve(__dirname, '../web/v3'),
     filename: '[name].js',
     clean: true
   },
@@ -52,7 +52,7 @@ const config = {
       patterns: [
         {
           from: path.resolve(__dirname, './src/assets/icon.png'),
-          to: path.resolve('../web/assets/icon.png')
+          to: path.resolve('../web/v3/assets/icon.png')
         }
       ]
     }),
