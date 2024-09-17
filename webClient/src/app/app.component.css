@@ -10,6 +10,7 @@
   Copyright Contributors to the Zowe Project.
 */
 @import url('~bootstrap/dist/css/bootstrap.min.css');
+@import url('../styles.css');
 
 .toggle-menu {
   width: 100%;
@@ -25,6 +26,7 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+
 .contract-menu {
   background: url(../assets/contract.png);
   background-repeat: no-repeat;
@@ -59,6 +61,7 @@
   height: 40px;
   width: 100%;
   display: flex;
+  margin-top: 0.1rem;
 }
 
 .toolbar {
@@ -97,6 +100,8 @@
 
 .vt-parent {
   background-color: #d6d6d6;
+  display:flex;
+  flex-direction: column;
 }
 
 .vt {
