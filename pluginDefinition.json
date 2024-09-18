@@ -11,7 +11,11 @@
     "launchDefinition": {
       "pluginShortNameKey": "VT Terminal",
       "pluginShortNameDefault": "VT Terminal",
-      "imageSrc": "assets/icon.png"
+      "imageSrc": "v3/assets/icon.png"
+    },
+    "entryPoint": {
+      "2.0": "main.js",
+      "3.0": "v3/main.js"
     },
     "descriptionKey": "VT Description",
     "descriptionDefault": "Basic VT Terminal Emulator for SSH and Telnet",
