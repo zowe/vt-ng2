@@ -1,59 +1,66 @@
 
 
 <!--
-  This program and the accompanying materials are
-  made available under the terms of the Eclipse Public License v2.0 which accompanies
-  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+This program and the accompanying materials are
+made available under the terms of the Eclipse Public License v2.0 which accompanies
+this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
 
-  SPDX-License-Identifier: EPL-2.0
+SPDX-License-Identifier: EPL-2.0
 
-  Copyright Contributors to the Zowe Project.
+Copyright Contributors to the Zowe Project.
 -->
 
 <div class="vt-parent" #terminalParent>
-  <button class="toggle-menu expand-menu" *ngIf="!showMenu" type="submit" (click)="toggleMenu(true)"></button>
-  <button class="toggle-menu contract-menu" *ngIf="showMenu" type="submit" (click)="toggleMenu(false)"></button>
-  <div *ngIf="showMenu" class="toolbar">
-    <div class="form-group toolbar-row">
-      <label class="col-sm-1 col-form-label">Host</label>
-      <div class="toolbar-input col-sm-2">
-        <input class="form-control" [disabled]="isInputDisabled" required minlength="1" (input)="validateHost()" [(ngModel)]="host">
+  @if (!showMenu) {
+    <button class="toggle-menu expand-menu" type="submit" (click)="toggleMenu(true)"></button>
+  }
+  @if (showMenu) {
+    <button class="toggle-menu contract-menu" type="submit" (click)="toggleMenu(false)"></button>
+  }
+  @if (showMenu) {
+    <div class="toolbar">
+      <div class="form-group toolbar-row">
+        <label class="col-sm-1 col-form-label">Host</label>
+        <div class="toolbar-input col-sm-2">
+          <input class="form-control" [disabled]="isInputDisabled" required minlength="1" (input)="validateHost()" [(ngModel)]="host">
+        </div>
+        <label class="col-sm-1 col-form-label">Port</label>
+        <div class="toolbar-input col-sm-1">
+          <input type="number" class="form-control" [disabled]="isInputDisabled" required min="0" max="65535" (input)="validatePort()" [(ngModel)]="port">
+        </div>
+        <label class="col-sm-1 col-form-label">Type</label>
+        <div class="toolbar-input col-sm-2">
+          <select [(ngModel)]="securityType" [disabled]="isInputDisabled" class="form-control">
+            <option value="0">Telnet</option>
+            <option value="1">SSH</option>
+          </select>
+        </div>
+        <div class="terminal-button">
+          <button type="submit" class="power-toggle-button btn" [style.background-color]="powerButtonColor" [disabled]="disableButton" (click)="toggleConnection()"></button>
+        </div>
+        <button class="save-button" type="submit" (click)="saveSettings()">
+          <i class="fa fa-save"></i>
+        </button>
       </div>
-      <label class="col-sm-1 col-form-label">Port</label>
-      <div class="toolbar-input col-sm-1">
-        <input type="number" class="form-control" [disabled]="isInputDisabled" required min="0" max="65535" (input)="validatePort()" [(ngModel)]="port">
-      </div>
-      <label class="col-sm-1 col-form-label">Type</label>
-      <div class="toolbar-input col-sm-2">
-        <select [(ngModel)]="securityType" [disabled]="isInputDisabled" class="form-control">
-          <option value="0">Telnet</option>
-          <option value="1">SSH</option>
-        </select>
-      </div>
-      <div class="terminal-button">
-        <button type="submit" class="power-toggle-button btn" [style.background-color]="powerButtonColor" [disabled]="disableButton" (click)="toggleConnection()"></button>
-      </div>
-      <button class="save-button" type="submit" (click)="saveSettings()">
-        <i class="fa fa-save"></i>
-      </button>
     </div>
-  </div>
-  <div class="toolbar" *ngIf="errorMessage.length > 0" style="height:40px">
-    <div class="row toolbar-row">
-      <label class="col-form-label error-label">Error: {{errorMessage}}</label>
+  }
+  @if (errorMessage.length > 0) {
+    <div class="toolbar" style="height:40px">
+      <div class="row toolbar-row">
+        <label class="col-form-label error-label">Error: {{errorMessage}}</label>
+      </div>
     </div>
-  </div>
+  }
   <div class="vt" [ngStyle]="terminalDivStyle"  #terminal>
   </div>
 </div>
 
 <!--
-  This program and the accompanying materials are
-  made available under the terms of the Eclipse Public License v2.0 which accompanies
-  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+This program and the accompanying materials are
+made available under the terms of the Eclipse Public License v2.0 which accompanies
+this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
 
-  SPDX-License-Identifier: EPL-2.0
+SPDX-License-Identifier: EPL-2.0
 
-  Copyright Contributors to the Zowe Project.
+Copyright Contributors to the Zowe Project.
 -->
-
