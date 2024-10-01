@@ -19,11 +19,12 @@ import { Angular2InjectionTokens, Angular2PluginWindowActions, Angular2PluginVie
 import {Terminal, TerminalWebsocketError} from './terminal';
 import {ConfigServiceTerminalConfig, TerminalConfig, ZssConfig} from './terminal.config';
 
+import './app.component.css';
+
 const TOGGLE_MENU_BUTTON_PX = 16; //with padding
 const CONFIG_MENU_ROW_PX = 40;
 const CONFIG_MENU_PAD_PX = 4;
 const CONFIG_MENU_SIZE_PX = CONFIG_MENU_ROW_PX+CONFIG_MENU_PAD_PX; //40 per row, plus 2 px padding
-
 
 enum ErrorType {
   host,
@@ -68,8 +69,7 @@ class ErrorState {
 
 @Component({
   selector: 'com-rs-mvd-vt',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  templateUrl: './app.component.html'
 })
 export class AppComponent implements AfterViewInit {
   @ViewChild('terminal')
@@ -421,4 +421,3 @@ export class AppComponent implements AfterViewInit {
 
   Copyright Contributors to the Zowe Project.
 */
-
