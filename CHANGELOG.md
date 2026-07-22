@@ -1,8 +1,7 @@
 # Basic VT Terminal Emulator Changelog
 
 ## `3.6.0`
-- Enhancement: When the server rejects a connection due to an `allowList` restriction, the status bar now shows "Connection forbidden" instead of a generic websocket error.
-- Enhancement: Default connection settings can now be configured via `components.vt-ng2.defaults` in `zowe.yaml` (host, port), replacing the need for `ZWED_SSH_*` environment variables. Env var fallback is preserved.
+- Enhancement: When the server rejects a connection due to an `allowList` restriction, the status bar now shows "Connection forbidden" instead of a generic websocket error. ([#83](https://github.com/zowe/vt-ng2/pull/83))
 
 ## `1.0.0`
 
