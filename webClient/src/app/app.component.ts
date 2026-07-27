@@ -118,8 +118,8 @@ export class AppComponent implements AfterViewInit {
 
     //defaulting initializations
     if (!this.host) this.host = "localhost";
-    if (!this.port) this.port = 23;
-    if (!this.securityType) this.securityType = "0";
+    if (!this.port) this.port = 22;
+    if (!this.securityType) this.securityType = "1";
   }
 
   ngOnInit(): void {
