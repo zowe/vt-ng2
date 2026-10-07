@@ -17,7 +17,7 @@ import {Observable} from 'rxjs';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, Angular2PluginViewportEvents, ContextMenuItem } from 'pluginlib/inject-resources';
 
 import {Terminal, TerminalWebsocketError} from './terminal';
-import {ConfigServiceTerminalConfig, TerminalConfig, ZssConfig} from './terminal.config';
+import {ConfigServiceTerminalConfig, TerminalConfig} from './terminal.config';
 
 import './app.component.css';
 
@@ -98,7 +98,7 @@ export class AppComponent implements AfterViewInit {
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
   ) {
     this.log.debug("Component Constructor");
-    this.log.info('Recvd launch metadata='+JSON.stringify(launchMetadata));
+    this.log.debug('Recvd launch metadata='+JSON.stringify(launchMetadata));
     if (launchMetadata != null && launchMetadata.data) {
       switch (launchMetadata.data.type) {
       case "connect":
@@ -118,8 +118,8 @@ export class AppComponent implements AfterViewInit {
 
     //defaulting initializations
     if (!this.host) this.host = "localhost";
-    if (!this.port) this.port = 23;
-    if (!this.securityType) this.securityType = "0";
+    if (!this.port) this.port = 22;
+    if (!this.securityType) this.securityType = "1";
   }
 
   ngOnInit(): void {
@@ -211,7 +211,12 @@ export class AppComponent implements AfterViewInit {
   }
 
   private onWSError(error: TerminalWebsocketError): void {
-    let message = "Terminal closed due to websocket error. Code="+error.code;
+    let message: string;
+    if (error.code === 4003) {
+      message = "Connection forbidden: host not permitted by server allowList";
+    } else {
+      message = "Terminal closed due to websocket error. Code="+error.code;
+    }
     this.log.warn(message+", Reason="+error.reason);
     this.setError(ErrorType.websocket, message);
     this.disconnectAndUnsetTitle();
@@ -306,12 +311,17 @@ export class AppComponent implements AfterViewInit {
   checkZssProxy(): Promise<any> {
     return new Promise((resolve, reject) => {
       if (this.host === "") {
-        this.loadZssSettings().subscribe((zssSettings: ZssConfig) => {
-          this.host = zssSettings.zssServerHostName;
-          resolve(this.host);
-        }, () => {
-          this.setError(ErrorType.host, "Invalid Hostname: \"" + this.host + "\".")
-          reject(this.host)
+        ZoweZLUX.environment.getAgentHost().then((agentHost) => {
+          if (agentHost) {
+            this.host = agentHost;
+            resolve(this.host);
+          } else {
+            this.setError(ErrorType.host, "Invalid Hostname: \"" + this.host + "\".");
+            reject(this.host);
+          }
+        }).catch(() => {
+          this.setError(ErrorType.host, "Invalid Hostname: \"" + this.host + "\".");
+          reject(this.host);
         });
       } else {
         resolve(this.host);
@@ -390,11 +400,6 @@ export class AppComponent implements AfterViewInit {
     this.log.warn("Config load is wrong and not abstracted");
     return this.http.get<ConfigServiceTerminalConfig>(ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(),'user','sessions','_defaultVT.json'));
   }
-
-  loadZssSettings(): Observable<ZssConfig> {
-    return this.http.get<ZssConfig>(ZoweZLUX.uriBroker.serverRootUri("server/proxies"));
-  }
-
 
   saveSettings() {
     let securityType = this.securityType == "1" ? "ssh" : "telnet";
