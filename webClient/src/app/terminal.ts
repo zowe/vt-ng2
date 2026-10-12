@@ -48,7 +48,11 @@ export class Terminal {
     connectionSettings.connect = true;
     connectionSettings.screenWidth = "MAX";
     connectionSettings.screenHeight = "MAX";
-    
+    //1 = the proxy must prompt for unverified certificates; 0 would tell it to accept them silently
+    if (connectionSettings.security) {
+      connectionSettings.security.badCert = 1;
+    }
+
     const wsErrorCallback = (wsCode: number, wsReason: string, terminalMessage: string) => {
       this.virtualScreen = null;
       this.wsErrorEmitter.next({code: wsCode, reason: wsReason, terminalMessage: terminalMessage});
