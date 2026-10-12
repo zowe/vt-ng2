@@ -1,9 +1,7 @@
 # Basic VT Terminal Emulator Changelog
 
-## Recent Changes
-- Bugfix: A certificate prompt (`CERT_PROMPT`) from the server is now rejected when no handler is registered, instead of being accepted automatically. The app also explicitly requests that the proxy prompt for unverified certificates.
-
 ## `3.6.0`
+- Bugfix: A certificate prompt (`CERT_PROMPT`) from the server is now rejected when no handler is registered, instead of being accepted automatically. The app also explicitly requests that the proxy prompt for unverified certificates.
 - Enhancement: When the server rejects a connection due to an `allowList` restriction, the status bar now shows "Connection forbidden" instead of a generic websocket error. ([#83](https://github.com/zowe/vt-ng2/pull/83))
 
 ## `1.0.0`
