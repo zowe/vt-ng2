@@ -51,6 +51,21 @@ Copyright Contributors to the Zowe Project.
       </div>
     </div>
   }
+  @if (showCertDialog && pendingCert) {
+    <div class="cert-dialog-overlay">
+      <div class="cert-dialog">
+        <div class="cert-dialog-title">SSH Host Key Verification</div>
+        <div class="cert-dialog-row">Host: <strong>{{pendingCert.host}}:{{pendingCert.port}}</strong></div>
+        <div class="cert-dialog-row">SHA-256 Fingerprint:</div>
+        <div class="cert-dialog-fp">{{pendingCert.fingerprint}}</div>
+        <div class="cert-dialog-buttons">
+          <button class="cert-btn cert-btn-reject" (click)="rejectCert()">Reject</button>
+          <button class="cert-btn cert-btn-once" (click)="acceptCertOnce()">Trust Once</button>
+          <button class="cert-btn cert-btn-permanent" (click)="acceptCertPermanently()">Trust Permanently</button>
+        </div>
+      </div>
+    </div>
+  }
   <div class="vt" [ngStyle]="terminalDivStyle"  #terminal>
   </div>
 </div>

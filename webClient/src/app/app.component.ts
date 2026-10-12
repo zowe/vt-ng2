@@ -19,6 +19,12 @@ import { Angular2InjectionTokens, Angular2PluginWindowActions, Angular2PluginVie
 import {Terminal, TerminalWebsocketError} from './terminal';
 import {ConfigServiceTerminalConfig, TerminalConfig} from './terminal.config';
 
+export interface KnownHostEntry {
+  fingerprint: string;
+  addedAt: string;
+  type: 'ssh';
+}
+
 import './app.component.css';
 
 const TOGGLE_MENU_BUTTON_PX = 16; //with padding
@@ -88,6 +94,9 @@ export class AppComponent implements AfterViewInit {
   private currentErrors: ErrorState = new ErrorState();
   disableButton: boolean;
   private savedSettings: TerminalConfig;
+  showCertDialog: boolean = false;
+  pendingCert: { host: string; port: number; fingerprint: string; replyFn: (fp: string, accepted: boolean) => void } | null = null;
+  private knownHosts: { [hostPort: string]: KnownHostEntry } = {};
 
   constructor(
     private http: HttpClient,
@@ -143,6 +152,10 @@ export class AppComponent implements AfterViewInit {
     const terminalParentElement = this.terminalParentElementRef.nativeElement;
     this.terminal = new Terminal(terminalElement, terminalParentElement, this.pluginDefinition, this.log);
     this.viewportEvents.resized.subscribe(() => this.terminal.performResize());
+    this.loadKnownHosts();
+    this.terminal.certCheckEmitter.subscribe((event: any) => {
+      this.onCertCheckRequired(event.host, event.fingerprint, event.replyFn);
+    });
     if (this.windowActions) {
       this.terminal.contextMenuEmitter.subscribe( (info) => {
         let screenContext:any = info.screenContext;
@@ -219,6 +232,7 @@ export class AppComponent implements AfterViewInit {
     }
     this.log.warn(message+", Reason="+error.reason);
     this.setError(ErrorType.websocket, message);
+    this.dismissCertDialog();
     this.disconnectAndUnsetTitle();
   }
 
@@ -412,6 +426,71 @@ export class AppComponent implements AfterViewInit {
         host: this.host,
       }
     ).subscribe((res) => this.log.debug('Save returned'));
+  }
+
+  private loadKnownHosts(): void {
+    this.http.get<any>(ZoweZLUX.uriBroker.pluginConfigForScopeUri(
+      this.pluginDefinition.getBasePlugin(), 'user', 'sessions', '_knownHosts.json'
+    )).subscribe((config) => {
+      if (config && config.contents) {
+        this.knownHosts = config.contents;
+      }
+    }, () => { /* no known-hosts file yet — normal on first run */ });
+  }
+
+  private saveKnownHosts(): void {
+    this.http.put(ZoweZLUX.uriBroker.pluginConfigForScopeUri(
+      this.pluginDefinition.getBasePlugin(), 'user', 'sessions', '_knownHosts.json'
+    ), { contents: this.knownHosts }).subscribe(() => {
+      this.log.debug('Known hosts saved');
+    });
+  }
+
+  private onCertCheckRequired(host: string, fingerprint: string, replyFn: (fp: string, accepted: boolean) => void): void {
+    const key = `${this.connectionSettings?.host || host}:${this.connectionSettings?.port || ''}`;
+    const known = this.knownHosts[key];
+    if (known && known.fingerprint === fingerprint) {
+      // Already permanently trusted — auto-accept silently
+      replyFn(fingerprint, true);
+      return;
+    }
+    this.pendingCert = {
+      host: this.connectionSettings?.host || host,
+      port: this.connectionSettings?.port,
+      fingerprint,
+      replyFn
+    };
+    this.showCertDialog = true;
+  }
+
+  acceptCertOnce(): void {
+    if (!this.pendingCert) { return; }
+    this.pendingCert.replyFn(this.pendingCert.fingerprint, true);
+    this.showCertDialog = false;
+    this.pendingCert = null;
+  }
+
+  acceptCertPermanently(): void {
+    if (!this.pendingCert) { return; }
+    const key = `${this.pendingCert.host}:${this.pendingCert.port}`;
+    this.knownHosts[key] = { fingerprint: this.pendingCert.fingerprint, addedAt: new Date().toISOString(), type: 'ssh' };
+    this.saveKnownHosts();
+    this.pendingCert.replyFn(this.pendingCert.fingerprint, true);
+    this.showCertDialog = false;
+    this.pendingCert = null;
+  }
+
+  rejectCert(): void {
+    if (!this.pendingCert) { return; }
+    this.pendingCert.replyFn(this.pendingCert.fingerprint, false);
+    this.showCertDialog = false;
+    this.pendingCert = null;
+  }
+
+  private dismissCertDialog(): void {
+    // WebSocket closed while dialog was open — dismiss without replying (connection already gone)
+    this.showCertDialog = false;
+    this.pendingCert = null;
   }
 }
 

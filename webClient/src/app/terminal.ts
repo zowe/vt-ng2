@@ -23,10 +23,17 @@ export type TerminalWebsocketError = {
   terminalMessage: string;
 }
 
+export type CertCheckEvent = {
+  host: string;
+  fingerprint: string;
+  replyFn: (fp: string, accepted: boolean) => void;
+}
+
 export class Terminal {
   virtualScreen: any;
   contextMenuEmitter: Subject<any> = new Subject();
   wsErrorEmitter: Subject<TerminalWebsocketError> = new Subject();
+  certCheckEmitter: Subject<CertCheckEvent> = new Subject();
   
   constructor(
     private terminalElement: HTMLElement,
@@ -48,17 +55,26 @@ export class Terminal {
     connectionSettings.connect = true;
     connectionSettings.screenWidth = "MAX";
     connectionSettings.screenHeight = "MAX";
+    // For SSH connections, enable host key prompting
+    if (connectionSettings.security && connectionSettings.security.type === 1) {
+      connectionSettings.security.badCert = 1;
+    }
     
     const wsErrorCallback = (wsCode: number, wsReason: string, terminalMessage: string) => {
       this.virtualScreen = null;
       this.wsErrorEmitter.next({code: wsCode, reason: wsReason, terminalMessage: terminalMessage});
+    };
+
+    // vt.js uses the minified property name 'Uu' for the certificate/host-key check callback
+    const certCheckCallback = (host: string, fingerprint: string, replyFn: (fp: string, accepted: boolean) => void) => {
+      this.certCheckEmitter.next({ host, fingerprint, replyFn });
     };
     
     this.virtualScreen = org_zowe_terminal_vt.startVT({parentDiv:this.terminalElement,
                                   width: width, height: height},
                                  connectionSettings,
                                  rendererSettings,
-                                 {wsErrorCallback: wsErrorCallback});
+                                 {wsErrorCallback: wsErrorCallback, Uu: certCheckCallback});
    // logic for using dispatcher goes here
    // should be in vtService.js eventually
    this.virtualScreen.contextCallback = (mouseEvent, screenContext) => {
