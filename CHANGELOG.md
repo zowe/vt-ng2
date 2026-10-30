@@ -1,7 +1,7 @@
 # Basic VT Terminal Emulator Changelog
 
 ## `3.6.0`
-- Enhancement: When the server rejects a connection due to an `allowList` restriction, the status bar now shows "Connection forbidden" instead of a generic websocket error. ([#83](https://github.com/zowe/vt-ng2/pull/83))
+- Enhancement: When the server rejects a connection due to an `allowList` or `allowPorts` restriction, the status bar now shows "Connection forbidden" instead of a generic websocket error. ([#83](https://github.com/zowe/vt-ng2/pull/83), [#89](https://github.com/zowe/vt-ng2/pull/89))
 
 ## `1.0.0`
 
